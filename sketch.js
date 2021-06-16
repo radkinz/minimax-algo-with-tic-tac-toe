@@ -89,16 +89,41 @@ function mouseReleased() {
   if (cell != null) {
     //update cell status if the cell is empty
     if (cell.status == "empty") {
+      //change cell status (so for example: turn an empty cell to X)
       cell.update_Status(turn_status)
       turn_status != flip_turn_status()
+
+      //check if there is a winner
+      let game_result = check_winner()
+      if (game_result != null) {
+        console.log(game_result)
+      }
+
+      //ai move
+
+      //get all empty cells aka possible ai moves
+      let empty_cells = []
+      for (x = 0; x < 3; x++) {
+        for (y = 0; y < 3; y++) {
+          if (cells[x][y].status == "empty") {
+            empty_cells.push(cells[x][y])
+          }
+        }
+      }
+
+      if (empty_cells.length > 0) {
+        let nextMove = bestMove()
+        cells[nextMove[0]][nextMove[1]].update_Status(turn_status)
+        turn_status != flip_turn_status()
+      }
+
+      //check if there is a winner
+      game_result = check_winner()
+      if (game_result != null) {
+        console.log(game_result)
+      }
     } else {
       alert("You may only select an empty cell")
-    }
-
-    //check if there is a winner
-    let game_result = check_winner()
-    if (game_result != null) {
-      console.log(game_result)
     }
   }
 }
@@ -145,9 +170,9 @@ function check_winner() {
 
   //check if tie
   tie = true //true unless proven false
-  for (x = 0; x < 3; x++) {
-    for (y = 0; y < 3; y++){
-      if (cells[0][0].status == "empty") {
+  for (let x = 0; x < 3; x++) {
+    for (let y = 0; y < 3; y++){
+      if (cells[x][y].status == "empty") {
         tie = false
         break
       }
@@ -156,5 +181,70 @@ function check_winner() {
 
   if (tie) {
     return "tie"
+  }
+}
+
+function bestMove() {
+  let bestScore = -Infinity
+  let bestMove;
+
+  //look at all availible spaces and see who has the highest minimax score
+  for (let x = 0; x < 3; x++) {
+    for (let y = 0; y < 3; y++) {
+      if (cells[x][y].status == "empty") {
+        cells[x][y].update_Status("O")
+        let score = minimax(cells, 0, false)
+        if (score > bestScore) {
+          bestScore = score
+          bestMove = [x, y]
+        }
+        cells[x][y].update_Status("empty")
+      }
+    }
+  }
+
+  //return optimal cell to go to
+  return bestMove
+}
+
+let scores = {
+  X: -10,
+  O: 10,
+  tie: 0
+};
+
+function minimax(cells, depth, isMaximizing) {
+  let result = check_winner();
+  if (result !== undefined) {
+    return scores[result];
+  }
+
+  if (isMaximizing) {
+    let bestScore = -Infinity
+    for (let x = 0; x < 3; x++) {
+      for (let y = 0; y < 3; y++) {
+        if (cells[x][y].status == "empty") {
+          cells[x][y].update_Status("O")
+          let score = minimax(cells, depth+1, false)
+          cells[x][y].update_Status("empty")
+          bestScore = max(bestScore, score)
+        }
+      }
+    }
+    return bestScore
+  } else {
+    let lowestScore = Infinity
+    for (let x = 0; x < 3; x++) {
+      for (let y = 0; y < 3; y++) {
+        if (cells[x][y].status == "empty") {
+          cells[x][y].update_Status("X")
+          let score = minimax(cells, depth+1, true)
+          cells[x][y].update_Status("empty")
+          lowestScore = min(lowestScore, score)   
+        }
+      }
+    }
+
+    return lowestScore
   }
 }
