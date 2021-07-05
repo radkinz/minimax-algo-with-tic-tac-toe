@@ -1,8 +1,19 @@
 html, body {
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 canvas {
   display: block;
+  margin-top: -30px;
+  z-index: 0;
+}
+
+h1 {
+  width: 100%;
+  font-weight: 600;
+  font-size: 300%;
+  margin-left: 20px;
+  z-index: 5;
 }
