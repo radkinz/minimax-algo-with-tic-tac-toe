@@ -48,6 +48,8 @@ let gameover = false
 
 //global variable to keep track of turns
 turn_status = "X"
+
+let button;
 function setup() {
   createCanvas(350, 350);
 
@@ -58,6 +60,24 @@ function setup() {
       cells[x][y] = new Cell((CELL_SIZE * x) + 20, (CELL_SIZE * y) + 20, CELL_SIZE)
     }
   }
+
+  button = select("#restart")  
+  button.mouseClicked(restartGame)
+}
+
+function restartGame() {
+  gameover = false
+
+  //reset cells
+  for (let x = 0; x < 3; x++) {
+    cells[x] = []
+    for (let y = 0; y < 3; y++) {
+      cells[x][y] = new Cell((CELL_SIZE * x) + 20, (CELL_SIZE * y) + 20, CELL_SIZE)
+    }
+  }
+
+  //reset turn status
+  turn_status = "X"
 }
 
 function draw() {
@@ -148,7 +168,7 @@ function flip_turn_status() {
 }
 
 //the establish winner function -> fills the winning spots and turns game off
-function establish_winner(x1, y1, x2, y2, x3, y3) {
+function establish_winner(x1, y1, x2, y2, x3, y3, result) {
   let c = color(round(random(255)), round(random(255)), round(random(255)))
   cells[x1][y1].c = c
   cells[x2][y2].c = c
